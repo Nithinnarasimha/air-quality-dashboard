@@ -36,6 +36,15 @@
 <body>
   <h1>ESW Lab Teams - Air Quality Dashboard</h1>
 
+  <!-- Kunal (New Team) -->
+  <div class="team-section">
+    <h2>Kunal</h2>
+    <div class="charts">
+      <div class="chart-container"><canvas id="kunal_pm10"></canvas></div>
+      <div class="chart-container"><canvas id="kunal_pm25"></canvas></div>
+    </div>
+  </div>
+
   <!-- Team 1 -->
   <div class="team-section">
     <h2>ESW Lab Team 1</h2>
@@ -74,6 +83,7 @@
 
   <script>
     const teams = [
+      { name: "Kunal", channelID: "3099976", apiKey: "5MLB5JS8PUMPDSRL", ids: { pm10: "kunal_pm10", pm25: "kunal_pm25" } },
       { name: "ESW Lab Team 1", channelID: "3100024", apiKey: "DRISYHC82F2J5B1E", ids: { pm10: "team1_pm10", pm25: "team1_pm25" } },
       { name: "ESW Lab Team 2", channelID: "3100026", apiKey: "FA0JTOPRM0MG4NZ7", ids: { pm10: "team2_pm10", pm25: "team2_pm25" } },
       { name: "ESW Lab Team 3", channelID: "3100027", apiKey: "EV6J2CHD0SYBT69G", ids: { pm10: "team3_pm10", pm25: "team3_pm25" } },
