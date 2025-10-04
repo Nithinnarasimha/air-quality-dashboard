@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Fields</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 20px;
+            gap: 50px; /* space between charts */
+        }
+        .chart-container {
+            width: 400px;
+            height: 300px;
+        }
+        h2 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chart-container">
+        <h2>PM2.5</h2>
+        <canvas id="pm10Chart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>PM10</h2>
+        <canvas id="pm25Chart"></canvas>
+    </div>
+
+    <script>
+        const channelID = "3099976";
+        const apiKey = "5MLB5JS8PUMPDSRL";
+
+        // Create charts
+        const ctx1 = document.getElementById('pm10Chart').getContext('2d');
+        const ctx2 = document.getElementById('pm25Chart').getContext('2d');
+
+        const pm10Chart = new Chart(ctx1, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'PM2.5', data: [], borderColor: 'blue', borderWidth: 2, pointBackgroundColor: 'blue', fill: false, tension: 0.3 }] },
+            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time (IST)' } }, y: { title: { display: true, text: 'Value' } } } }
+        });
+
+        const pm25Chart = new Chart(ctx2, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'PM10', data: [], borderColor: 'green', borderWidth: 2, pointBackgroundColor: 'green', fill: false, tension: 0.3 }] },
+            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time (IST)' } }, y: { title: { display: true, text: 'Value' } } } }
+        });
+
+        // Fetch ThingSpeak data
+        async function fetchData() {
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
+            const response = await fetch(url);
+            const data = await response.json();
+            const feeds = data.feeds;
+
+            const labels = feeds.map(feed => {
+                const date = new Date(feed.created_at); // UTC time
+                return date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" });
+            });
+
+            const pm10Values = feeds.map(feed => parseFloat(feed.field1));
+            const pm25Values = feeds.map(feed => parseFloat(feed.field2));
+
+            pm10Chart.data.labels = labels;
+            pm10Chart.data.datasets[0].data = pm10Values;
+            pm10Chart.update();
+
+            pm25Chart.data.labels = labels;
+            pm25Chart.data.datasets[0].data = pm25Values;
+            pm25Chart.update();
+        }
+
+        fetchData();
+        setInterval(fetchData, 15000); // update every 15 seconds
+    </script>
+
+</body>
+</html>
