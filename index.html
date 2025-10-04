@@ -1,89 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Quality Fields</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            margin: 20px;
-            gap: 50px; /* space between charts */
-        }
-        .chart-container {
-            width: 400px;
-            height: 300px;
-        }
-        h2 {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESW Lab Teams - Air Quality Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .team-section {
+      margin-bottom: 50px;
+    }
+    .charts {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .chart-container {
+      width: 400px;
+      height: 300px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
+  <h1>ESW Lab Teams - Air Quality Dashboard</h1>
 
-    <div class="chart-container">
-        <h2>PM2.5</h2>
-        <canvas id="pm10Chart"></canvas>
+  <!-- Team 1 -->
+  <div class="team-section">
+    <h2>ESW Lab Team 1</h2>
+    <div class="charts">
+      <div class="chart-container"><canvas id="team1_pm10"></canvas></div>
+      <div class="chart-container"><canvas id="team1_pm25"></canvas></div>
     </div>
+  </div>
 
-    <div class="chart-container">
-        <h2>PM10</h2>
-        <canvas id="pm25Chart"></canvas>
+  <!-- Team 2 -->
+  <div class="team-section">
+    <h2>ESW Lab Team 2</h2>
+    <div class="charts">
+      <div class="chart-container"><canvas id="team2_pm10"></canvas></div>
+      <div class="chart-container"><canvas id="team2_pm25"></canvas></div>
     </div>
+  </div>
 
-    <script>
-        const channelID = "3099976";
-        const apiKey = "5MLB5JS8PUMPDSRL";
+  <!-- Team 3 -->
+  <div class="team-section">
+    <h2>ESW Lab Team 3</h2>
+    <div class="charts">
+      <div class="chart-container"><canvas id="team3_pm10"></canvas></div>
+      <div class="chart-container"><canvas id="team3_pm25"></canvas></div>
+    </div>
+  </div>
 
-        // Create charts
-        const ctx1 = document.getElementById('pm10Chart').getContext('2d');
-        const ctx2 = document.getElementById('pm25Chart').getContext('2d');
+  <!-- Team 4 -->
+  <div class="team-section">
+    <h2>ESW Lab Team 4</h2>
+    <div class="charts">
+      <div class="chart-container"><canvas id="team4_pm10"></canvas></div>
+      <div class="chart-container"><canvas id="team4_pm25"></canvas></div>
+    </div>
+  </div>
 
-        const pm10Chart = new Chart(ctx1, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'PM2.5', data: [], borderColor: 'blue', borderWidth: 2, pointBackgroundColor: 'blue', fill: false, tension: 0.3 }] },
-            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time (IST)' } }, y: { title: { display: true, text: 'Value' } } } }
-        });
+  <script>
+    const teams = [
+      { name: "ESW Lab Team 1", channelID: "3100024", apiKey: "DRISYHC82F2J5B1E", ids: { pm10: "team1_pm10", pm25: "team1_pm25" } },
+      { name: "ESW Lab Team 2", channelID: "3100026", apiKey: "FA0JTOPRM0MG4NZ7", ids: { pm10: "team2_pm10", pm25: "team2_pm25" } },
+      { name: "ESW Lab Team 3", channelID: "3100027", apiKey: "EV6J2CHD0SYBT69G", ids: { pm10: "team3_pm10", pm25: "team3_pm25" } },
+      { name: "ESW Lab Team 4", channelID: "3100029", apiKey: "KRFAHL9P7ASAOVTJ", ids: { pm10: "team4_pm10", pm25: "team4_pm25" } }
+    ];
 
-        const pm25Chart = new Chart(ctx2, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'PM10', data: [], borderColor: 'green', borderWidth: 2, pointBackgroundColor: 'green', fill: false, tension: 0.3 }] },
-            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time (IST)' } }, y: { title: { display: true, text: 'Value' } } } }
-        });
+    const charts = {};
 
-        // Fetch ThingSpeak data
-        async function fetchData() {
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
-            const response = await fetch(url);
-            const data = await response.json();
-            const feeds = data.feeds;
+    // Create charts for each team
+    teams.forEach(team => {
+      const ctxPM10 = document.getElementById(team.ids.pm10).getContext("2d");
+      const ctxPM25 = document.getElementById(team.ids.pm25).getContext("2d");
 
-            const labels = feeds.map(feed => {
-                const date = new Date(feed.created_at); // UTC time
-                return date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" });
-            });
+      charts[team.ids.pm10] = new Chart(ctxPM10, {
+        type: "line",
+        data: { labels: [], datasets: [{ label: "PM10", data: [], borderColor: "blue", borderWidth: 2, fill: false, tension: 0.3 }] },
+        options: { responsive: true, scales: { x: { title: { display: true, text: "Time (IST)" } }, y: { title: { display: true, text: "µg/m³" } } } }
+      });
 
-            const pm10Values = feeds.map(feed => parseFloat(feed.field1));
-            const pm25Values = feeds.map(feed => parseFloat(feed.field2));
+      charts[team.ids.pm25] = new Chart(ctxPM25, {
+        type: "line",
+        data: { labels: [], datasets: [{ label: "PM2.5", data: [], borderColor: "green", borderWidth: 2, fill: false, tension: 0.3 }] },
+        options: { responsive: true, scales: { x: { title: { display: true, text: "Time (IST)" } }, y: { title: { display: true, text: "µg/m³" } } } }
+      });
+    });
 
-            pm10Chart.data.labels = labels;
-            pm10Chart.data.datasets[0].data = pm10Values;
-            pm10Chart.update();
+    // Fetch data function
+    async function fetchData(team) {
+      const url = `https://api.thingspeak.com/channels/${team.channelID}/feeds.json?api_key=${team.apiKey}&results=20`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const feeds = data.feeds;
 
-            pm25Chart.data.labels = labels;
-            pm25Chart.data.datasets[0].data = pm25Values;
-            pm25Chart.update();
-        }
+      const labels = feeds.map(feed => {
+        const date = new Date(feed.created_at);
+        return date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" });
+      });
 
-        fetchData();
-        setInterval(fetchData, 15000); // update every 15 seconds
-    </script>
+      const pm10Values = feeds.map(feed => parseFloat(feed.field1));
+      const pm25Values = feeds.map(feed => parseFloat(feed.field2));
 
+      charts[team.ids.pm10].data.labels = labels;
+      charts[team.ids.pm10].data.datasets[0].data = pm10Values;
+      charts[team.ids.pm10].update();
+
+      charts[team.ids.pm25].data.labels = labels;
+      charts[team.ids.pm25].data.datasets[0].data = pm25Values;
+      charts[team.ids.pm25].update();
+    }
+
+    // Fetch data for all teams every 15 sec
+    function updateAll() {
+      teams.forEach(team => fetchData(team));
+    }
+
+    updateAll();
+    setInterval(updateAll, 15000);
+  </script>
 </body>
 </html>
